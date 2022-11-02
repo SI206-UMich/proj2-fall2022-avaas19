@@ -25,8 +25,41 @@ def get_listings_from_search_results(html_file):
         ('Loft in Mission District', 210, '1944564'),  # example
     ]
     """
-    pass
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    full_path = os.path.join(base_path, html_file)
+    search_file = open(full_path, 'r')
+    
+    soup = BeautifulSoup(search_file, 'html.parser')
+    titles = soup.find_all('div', class_ = 't1jojoys')
+    prices = soup.find_all('span', class_='_tyxjp1')
+    urls = soup.find_all('div', itemtype = 'http://schema.org/ListItem')
 
+    title_lst = []
+    price_lst = []
+    id_lst = []
+    for item in titles:
+        title = item.text
+        title_lst.append(title)
+
+    for items in prices:
+        price = items.text.strip('$')
+        price_lst.append(price)
+    
+    for item in urls:
+        url = item.find('div', class_ = 'cy5jw6o dir dir-ltr')['aria-labelledby']
+        titlecontents = url.split('_')
+        newurl = titlecontents[1]
+        id_lst.append(newurl)
+
+    tup_lst = []
+    for i in range(0,len(title_lst)):
+        tup = (title_lst[i], price_lst[i], id_lst[i])
+        tup_lst.append(tup)
+
+    search_file.close()
+    return tup_lst
+
+    
 
 def get_listing_information(listing_id):
     """
@@ -52,7 +85,26 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
-    pass
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    full_path = os.path.join(base_path, "html_files/listing_" + listing_id + ".html")
+    search_file = open(full_path, 'r', encoding = 'UTF-8')
+    soup = BeautifulSoup(search_file, 'html.parser')
+    pol_num = soup.find_all('li', class_ = 'f19phm7j dir dir-ltr')[0].text
+    place_type = soup.find_all('title')
+    # num_bedrooms = soup.find_all('div', itemtype = 'http://schema.org/ListItem')
+    search_file.close()
+
+    print(place_type)
+
+    if 'pending' in pol_num.lower():
+        number = 'Pending'
+    elif 'exempt'in pol_num.lower() or 'not needed' in pol_num.lower():
+        number = 'Exempt'
+    else:
+        number = pol_num.lstrip('Policy number: ')
+    return str(number)
+    
+
 
 
 def get_detailed_listing_database(html_file):
@@ -181,61 +233,61 @@ class TestCases(unittest.TestCase):
 
         pass
 
-    def test_get_detailed_listing_database(self):
-        # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
-        # and save it to a variable
-        detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
-        # check that we have the right number of listings (20)
-        self.assertEqual(len(detailed_database), 20)
-        for item in detailed_database:
-            # assert each item in the list of listings is a tuple
-            self.assertEqual(type(item), tuple)
-            # check that each tuple has a length of 6
+    # def test_get_detailed_listing_database(self):
+    #     # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
+    #     # and save it to a variable
+    #     detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
+    #     # check that we have the right number of listings (20)
+    #     self.assertEqual(len(detailed_database), 20)
+    #     for item in detailed_database:
+    #         # assert each item in the list of listings is a tuple
+    #         self.assertEqual(type(item), tuple)
+    #         # check that each tuple has a length of 6
 
-        # check that the first tuple is made up of the following:
-        # 'Loft in Mission District', 210, '1944564', '2022-004088STR', 'Entire Room', 1
+    #     # check that the first tuple is made up of the following:
+    #     # 'Loft in Mission District', 210, '1944564', '2022-004088STR', 'Entire Room', 1
 
-        # check that the last tuple is made up of the following:
-        # 'Guest suite in Mission District', 238, '32871760', 'STR-0004707', 'Entire Room', 1
+    #     # check that the last tuple is made up of the following:
+    #     # 'Guest suite in Mission District', 238, '32871760', 'STR-0004707', 'Entire Room', 1
 
-        pass
+    #     pass
 
-    def test_write_csv(self):
-        # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
-        # and save the result to a variable
-        detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
-        # call write csv on the variable you saved
-        write_csv(detailed_database, "test.csv")
-        # read in the csv that you wrote
-        csv_lines = []
-        with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test.csv'), 'r') as f:
-            csv_reader = csv.reader(f)
-            for i in csv_reader:
-                csv_lines.append(i)
-        # check that there are 21 lines in the csv
-        self.assertEqual(len(csv_lines), 21)
-        # check that the header row is correct
+    # def test_write_csv(self):
+    #     # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
+    #     # and save the result to a variable
+    #     detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
+    #     # call write csv on the variable you saved
+    #     write_csv(detailed_database, "test.csv")
+    #     # read in the csv that you wrote
+    #     csv_lines = []
+    #     with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test.csv'), 'r') as f:
+    #         csv_reader = csv.reader(f)
+    #         for i in csv_reader:
+    #             csv_lines.append(i)
+    #     # check that there are 21 lines in the csv
+    #     self.assertEqual(len(csv_lines), 21)
+    #     # check that the header row is correct
 
-        # check that the next row is Private room in Mission District,82,51027324,Pending,Private Room,1
+    #     # check that the next row is Private room in Mission District,82,51027324,Pending,Private Room,1
 
-        # check that the last row is Apartment in Mission District,399,28668414,Pending,Entire Room,2
+    #     # check that the last row is Apartment in Mission District,399,28668414,Pending,Entire Room,2
 
-        pass
+    #     pass
 
-    def test_check_policy_numbers(self):
-        # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
-        # and save the result to a variable
-        detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
-        # call check_policy_numbers on the variable created above and save the result as a variable
-        invalid_listings = check_policy_numbers(detailed_database)
-        # check that the return value is a list
-        self.assertEqual(type(invalid_listings), list)
-        # check that there is exactly one element in the string
+    # def test_check_policy_numbers(self):
+    #     # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
+    #     # and save the result to a variable
+    #     detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
+    #     # call check_policy_numbers on the variable created above and save the result as a variable
+    #     invalid_listings = check_policy_numbers(detailed_database)
+    #     # check that the return value is a list
+    #     self.assertEqual(type(invalid_listings), list)
+    #     # check that there is exactly one element in the string
 
-        # check that the element in the list is a string
+    #     # check that the element in the list is a string
 
-        # check that the first element in the list is '16204265'
-        pass
+    #     # check that the first element in the list is '16204265'
+    #     pass
 
 
 if __name__ == '__main__':

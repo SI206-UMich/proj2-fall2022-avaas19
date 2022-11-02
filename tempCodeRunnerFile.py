@@ -1,0 +1,1 @@
+ place_type = soup.find_all('span', class_='_tyxjp1')
