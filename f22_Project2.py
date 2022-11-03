@@ -227,6 +227,32 @@ def extra_credit(listing_id):
     gone over their 90 day limit, else return True, indicating the lister has
     never gone over their limit.
     """
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    full_path = os.path.join(base_path, "html_files/listing_" + listing_id + "_reviews.html")
+    review_file = open(full_path, 'r', encoding = 'UTF-8')
+    soup = BeautifulSoup(review_file, 'html.parser')
+    test = soup.find_all('li', class_ = '_1f1oir5')
+    review_file.close()
+    years = {}
+    for i in test:
+        dates = i.text
+        years[dates[-4:]] = years.get(dates[-4:],0)+1
+    count = 0
+    for key in years:
+        num_rev = years.get(key)
+        if num_rev > 90:
+            count += 1
+        else:
+            continue
+
+    if count != 0:
+        return False
+    else: 
+        return True
+        
+
+
+
     
 
 
@@ -331,6 +357,14 @@ class TestCases(unittest.TestCase):
         self.assertEqual(type(invalid_listings[0]), str)
         # check that the first element in the list is '16204265'
         self.assertEqual(invalid_listings[0], '16204265')
+
+    def test_extra_credit(self):
+        listing_id = ['1944564', '16204265']
+        review = [extra_credit(i) for i in listing_id]
+        self.assertEqual(review[0], True)
+        self.assertEqual(review[1], False)
+
+
 
 
 if __name__ == '__main__':
