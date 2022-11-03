@@ -1,1 +1,2 @@
- place_type = soup.find_all('span', class_='_tyxjp1')
+   # tup = (number)
+    # print(tup)
