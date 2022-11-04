@@ -359,9 +359,13 @@ class TestCases(unittest.TestCase):
         self.assertEqual(invalid_listings[0], '16204265')
 
     def test_extra_credit(self):
+        #create is list of ids to the review pages that need to be scraped
         listing_id = ['1944564', '16204265']
+        #save result to a variable
         review = [extra_credit(i) for i in listing_id]
+        #test the result from the first listing is true 
         self.assertEqual(review[0], True)
+        #test that the result from the second listing is false
         self.assertEqual(review[1], False)
 
 
