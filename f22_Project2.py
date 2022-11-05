@@ -5,6 +5,10 @@ import os
 import csv
 import unittest
 
+# Your name: Adam Vaas
+# Your student id: 16088832
+# Your email:  avaas@umich.edu
+# List who you have worked with on this project: Frederick Kusumo
 
 def get_listings_from_search_results(html_file):
     """
